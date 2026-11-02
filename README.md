@@ -5,8 +5,8 @@ from the book in a deep podcast voice while an animated Rive character listens, 
 
 ![Silas on air, answering a question about Aesop's Fables](case-study/assets/ui-silas-on-air.png)
 
-Everything runs on Gemini's free tier. **Case study:** [`case-study/index.html`](case-study/index.html) covers the design
-decisions, latency measurements and how each character was rigged.
+Everything runs on Gemini's free tier. **Case study:** [shriy-singh.github.io/baa-ook-club](https://shriy-singh.github.io/baa-ook-club/)
+covers the design decisions, latency measurements and how each character was rigged (source in [`case-study/`](case-study/)).
 
 ## Run it
 
