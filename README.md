@@ -5,6 +5,8 @@ from the book in a deep podcast voice while an animated Rive character listens, 
 
 ![Silas on air, answering a question about Aesop's Fables](case-study/assets/ui-silas-on-air.png)
 
+**Try it:** [baa-ook-book-club.vercel.app](https://baa-ook-book-club.vercel.app/) (installable on phones).
+
 Everything runs on Gemini's free tier. **Case study:** [shriy-singh.github.io/baa-ook-club](https://shriy-singh.github.io/baa-ook-club/)
 covers the design decisions, latency measurements and how each character was rigged (source in [`case-study/`](case-study/)).
 
