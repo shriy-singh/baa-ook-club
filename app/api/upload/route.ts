@@ -1,4 +1,4 @@
-import { errorMessage, gemini } from "@/lib/gemini";
+import { MISSING_KEY, errorMessage, gemini } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         return Response.json({ error: "That PDF is too big. Gemini reads PDFs up to 50 MB." }, { status: 413 });
       }
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error("GEMINI_API_KEY is missing. Add it to .env.local and restart the dev server.");
+      if (!apiKey) throw new Error(MISSING_KEY);
       const res = await fetch("https://generativelanguage.googleapis.com/upload/v1beta/files", {
         method: "POST",
         headers: {

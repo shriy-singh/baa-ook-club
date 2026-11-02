@@ -25,9 +25,12 @@ How you answer:
 export const INTRO_REQUEST =
   "Open the episode. In two or three sentences, welcome the listener, name the book and its author if you can tell, say in one line what it is about, and invite them to ask you anything about it.";
 
+export const MISSING_KEY =
+  "GEMINI_API_KEY is missing. Locally, add it to .env.local and restart; on Vercel, add it under Settings > Environment Variables (Production) and redeploy.";
+
 export function gemini() {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY is missing. Add it to .env.local and restart the dev server.");
+  if (!apiKey) throw new Error(MISSING_KEY);
   return new GoogleGenAI({ apiKey });
 }
 
