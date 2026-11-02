@@ -19,6 +19,8 @@ export type Character = {
   /** The part of the artboard to show, in artboard units. */
   crop: Crop;
   stage: string;
+  /** The soft colour the whole room takes on while this host is on. */
+  world: string;
   credit: { title: string; author: string; url: string };
 };
 
@@ -34,6 +36,7 @@ export const CHARACTERS: Character[] = [
     src: "/characters/sheep.riv",
     crop: { x: 95, y: 250, w: 310, h: 390 },
     stage: "#a9a9a9",
+    world: "#c9d6a5",
     credit: { title: "Kuzu Kuzu Mee", author: "musaadanur", url: "https://rive.app/community/files/28304-53466-kuzu-kuzu-mee/" },
   },
   {
@@ -45,8 +48,9 @@ export const CHARACTERS: Character[] = [
     voice: "Algenib",
     voiceStyle: "a deep, gravelly, friendly voice; warm and enthusiastic but unhurried, like a gentle giant",
     src: "/characters/yeti.riv",
-    crop: { x: 90, y: 80, w: 420, h: 528 },
+    crop: { x: 96, y: 78, w: 408, h: 514 },
     stage: "#d5dee6",
+    world: "#bfd5e6",
     credit: { title: "Wave, Hear and talk", author: "japarj (remix of JcToon)", url: "https://rive.app/community/files/5628-11215-wave-hear-and-talk/" },
   },
   {
@@ -60,6 +64,7 @@ export const CHARACTERS: Character[] = [
     src: "/characters/beard.riv",
     crop: { x: -24, y: -10, w: 448, h: 564 },
     stage: "#e7d6c2",
+    world: "#e6b998",
     credit: { title: "Character face animation", author: "ak2665622", url: "https://rive.app/community/files/4532-9211-character-face-animation/" },
   },
   {
@@ -73,6 +78,7 @@ export const CHARACTERS: Character[] = [
     src: "/characters/pixel.riv",
     crop: { x: 127, y: 70, w: 246, h: 310 },
     stage: "#a27d5c",
+    world: "#d2c5ec",
     credit: { title: "Rive Avatar", author: "nasmith", url: "https://rive.app/marketplace/28249-53356-rive-avatar/" },
   },
 ];
@@ -82,6 +88,20 @@ export const DEFAULT_CHARACTER: CharacterId = "woolf";
 export function getCharacter(id: string | undefined): Character {
   return CHARACTERS.find((c) => c.id === id) ?? CHARACTERS[0];
 }
+
+/** Blends two #rrggbb colours; `amount` is how much of `b` to use. */
+export function mix(a: string, b: string, amount: number) {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  return (
+    "#" +
+    [0, 1, 2]
+      .map((i) => Math.round(channel(a, i) * (1 - amount) + channel(b, i) * amount).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+export const INK = "#2e2622";
+export const PAPER = "#fdf8ef";
 
 // Gemini prebuilt voices offered in the picker.
 export const VOICES = [

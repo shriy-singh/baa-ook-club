@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Avatar, { type AvatarMode, type Reaction } from "@/components/Avatar";
-import { CHARACTERS, DEFAULT_CHARACTER, VOICES, getCharacter, type CharacterId } from "@/lib/characters";
+import { CHARACTERS, DEFAULT_CHARACTER, INK, PAPER, VOICES, getCharacter, mix, type CharacterId } from "@/lib/characters";
 
 type Line = { who: "you" | "host"; host?: CharacterId; text: string };
 type Book = { name: string; uri: string; mimeType: string };
@@ -46,6 +46,11 @@ export default function Page() {
   useEffect(() => {
     setCanListen(!!getRecognition());
   }, []);
+  // The whole room takes on the current host's colour, including the area behind the layout.
+  useEffect(() => {
+    document.body.style.setProperty("--world", host.world);
+    document.body.style.setProperty("--shade", mix(host.world, INK, 0.55));
+  }, [host.world]);
   useEffect(() => {
     const list = transcriptRef.current;
     if (list) list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
@@ -251,7 +256,7 @@ export default function Page() {
     <main className="studio">
       <header className="masthead">
         <div>
-          <p className="eyebrow">A voice AI book podcast, hosted by {host.name}</p>
+          <p className="eyebrow">A cozy book chat, hosted tonight by {host.name}</p>
           <h1>Baa-ook Club</h1>
         </div>
         <div className={`on-air ${onAir ? "live" : ""} ${listening ? "hearing" : ""}`} aria-live="polite">
@@ -267,6 +272,7 @@ export default function Page() {
               role="radio"
               aria-checked={c.id === hostId}
               className={`host ${c.id === hostId ? "on" : ""}`}
+              style={{ "--chip": c.world } as React.CSSProperties}
               onClick={() => pickHost(c.id)}
             >
               <img src={`/characters/${c.id}.png`} alt="" width={40} height={40} style={{ background: c.stage }} />
@@ -277,7 +283,7 @@ export default function Page() {
 
         <div className={`stage ${onAir ? "live" : ""}`} style={{ background: host.stage }}>
           <Avatar character={host} mode={mode} getLevel={getLevel} reaction={reaction} />
-          {book && <div className="book-chip" title={book.name}>📖 {book.name}</div>}
+          {book && <div className="book-chip" title={book.name}><span>Reading</span> {book.name}</div>}
         </div>
 
         <p className={`caption ${caption ? "" : "muted"}`}>
@@ -350,12 +356,16 @@ export default function Page() {
         ) : (
           <ol className="transcript" ref={transcriptRef}>
             {lines.map((l, i) => (
-              <li key={i} className={`line-${l.who}`}>
+              <li
+                key={i}
+                className={`line-${l.who}`}
+                style={l.host ? { background: mix(getCharacter(l.host).world, PAPER, 0.55) } : undefined}
+              >
                 <span className="who">{l.who === "you" ? "You" : getCharacter(l.host).name}</span>
                 <p>{l.text}</p>
                 {l.who === "host" && !onAir && !busy && (
                   <button className="replay" onClick={() => { unlockAudio(); void speak(l.text, l.host).catch((e) => setError(e.message)); }}>
-                    ▶ Replay
+                    Replay
                   </button>
                 )}
               </li>
