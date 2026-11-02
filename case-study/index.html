@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baa-ook Club · Voice AI case study</title>
+<meta name="description" content="A voice AI that reads your book and talks it through with you, hosted by an animated character you choose. Built on a free Gemini stack and Rive.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #17140f;
+    --panel: #221e18;
+    --panel-2: #2c2720;
+    --line: #3a342b;
+    --text: #f3ece0;
+    --muted: #a99f8f;
+    --accent: #f2b24c;
+    --accent-ink: #241a08;
+    --live: #ff5a4e;
+    --sky: #8fb8d8;
+    --radius: 18px;
+    --measure: 680px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 17px/1.65 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  img { max-width: 100%; display: block; }
+  h1, h2, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.1; margin: 0; }
+  h1 { font-size: clamp(44px, 8vw, 84px); font-weight: 800; letter-spacing: -.02em; }
+  h2 { font-size: clamp(28px, 4.2vw, 38px); font-weight: 800; letter-spacing: -.01em; margin-bottom: 18px; }
+  h3 { font-size: 21px; font-weight: 600; margin: 34px 0 10px; }
+  p { margin: 0 0 16px; }
+  strong { color: #fff; font-weight: 600; }
+  code { font: 500 .88em "JetBrains Mono", ui-monospace, monospace; background: var(--panel-2); padding: 2px 6px; border-radius: 6px; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  .prose { max-width: var(--measure); }
+  .eyebrow { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 12px; }
+  .num { color: var(--accent); font-family: "JetBrains Mono", monospace; font-size: 14px; letter-spacing: .04em; margin-bottom: 8px; display: block; }
+  section { padding: 72px 0 0; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* Hero */
+  header.hero { padding: 64px 0 0; }
+  .lede { font-size: clamp(19px, 2.4vw, 23px); line-height: 1.5; color: #e6dccb; max-width: 760px; margin: 22px 0 18px; }
+  .byline { color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 26px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
+    font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid var(--line); color: var(--text); background: var(--panel);
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .shot { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 80px -40px rgba(0,0,0,.9); }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; line-height: 1.5; }
+
+  /* Glance */
+  .glance { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+  .glance div { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .glance dt { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+  .glance dd { margin: 0; font-size: 15px; line-height: 1.5; }
+
+  /* Cards, grids */
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .two > *, .gifs > *, .cut > *, .principles > * { min-width: 0; }
+  .callout { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 12px; padding: 16px 18px; margin: 22px 0; }
+  .callout p:last-child { margin: 0; }
+  .principles { list-style: none; padding: 0; margin: 20px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .principles li { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; font-size: 15px; }
+  .principles b { display: block; font-family: Fraunces, Georgia, serif; font-size: 18px; margin-bottom: 4px; color: #fff; }
+
+  /* Pipeline diagram */
+  .diagram { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin: 26px 0 8px; overflow-x: auto; }
+  .diagram svg { min-width: 720px; width: 100%; height: auto; display: block; }
+
+  /* Latency bars */
+  .bars { display: grid; gap: 10px; margin: 22px 0 6px; }
+  .bar { display: grid; grid-template-columns: 210px minmax(0, 1fr) 90px; align-items: center; gap: 12px; font-size: 14px; }
+  .bar .track { height: 14px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+  .bar .track, .bar .fill { display: block; }
+  .bar .fill { height: 100%; border-radius: 999px; background: var(--muted); }
+  .bar.win .fill { background: var(--accent); }
+  .bar.bad .fill { background: var(--live); }
+  .bar .val { font-family: "JetBrains Mono", monospace; text-align: right; color: var(--text); }
+  .bar .name { color: var(--muted); }
+  .bar.win .name { color: var(--text); font-weight: 600; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--line); border-radius: 14px; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; background: var(--panel); }
+  tr:last-child td { border-bottom: 0; }
+  td .host { display: flex; align-items: center; gap: 10px; font-weight: 600; white-space: nowrap; }
+  td .host img { width: 34px; height: 34px; border-radius: 50%; }
+
+  /* GIF grid */
+  .gifs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 24px 0 8px; }
+  .gifs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gifs figure img { border-radius: 14px; border: 1px solid var(--line); width: 100%; aspect-ratio: 300 / 378; object-fit: cover; }
+  .gifs figcaption b { color: var(--text); }
+
+  /* Transcript sample */
+  .chat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 18px; margin: 20px 0; }
+  .chat p { margin: 14px 0; font-size: 15px; }
+  .chat .who { display: block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .chat .host .who { color: var(--accent); }
+
+  pre { background: #110f0b; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; overflow-x: auto; font: 13.5px/1.6 "JetBrains Mono", ui-monospace, monospace; color: #e8dfcf; margin: 18px 0; }
+  pre .c { color: #8b8170; }
+  pre .k { color: var(--accent); }
+
+  ul.clean { padding-left: 20px; margin: 0 0 16px; }
+  ul.clean li { margin-bottom: 8px; }
+  .cut { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+  .cut div { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; font-size: 15px; }
+  .cut b { display: block; color: #fff; margin-bottom: 4px; }
+
+  footer { margin-top: 90px; padding: 32px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  footer p { max-width: 820px; }
+
+  @media (max-width: 860px) {
+    .glance { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .two, .principles, .cut { grid-template-columns: minmax(0, 1fr); }
+    .gifs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .gifs.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bar { grid-template-columns: 1fr 70px; }
+    .bar .track { grid-column: 1 / -1; grid-row: 2; }
+    section { padding-top: 56px; }
+  }
+  @media (max-width: 480px) {
+    body { font-size: 16px; }
+    .glance { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<header class="hero wrap">
+  <p class="eyebrow">Voice AI · Product case study</p>
+  <h1>Baa-ook Club</h1>
+  <p class="lede">A voice AI that reads your book and talks it through with you. Upload a PDF, ask out loud, and an animated host answers in a deep podcast voice, grounded in the pages you gave it. Four hosts to choose from, all running on a free stack.</p>
+  <div class="byline">
+    <span>[Your name]</span><span>[Your role, e.g. Product designer]</span><span>November 2026</span>
+  </div>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/shriy-singh/baa-ook-club">View the code on GitHub</a>
+    <a class="btn" href="#build">Build your own</a>
+  </div>
+  <figure class="shot"><img src="assets/ui-silas-on-air.png" alt="The Baa-ook Club app. Silas, a bearded storyteller, is on air answering a question about Aesop's Fables; the show notes panel shows the conversation so far with answers from Woolf and Frost." width="1920" height="1230"></figure>
+
+  <dl class="glance">
+    <div><dt>What</dt><dd>A web app: pick a host, hand them a book, ask questions by voice or text, hear answers in character.</dd></div>
+    <div><dt>My role</dt><dd>Product, interaction design, character direction, voice and persona design. Code paired with Claude Code.</dd></div>
+    <div><dt>Stack</dt><dd>Gemini Flash-Lite + Gemini TTS + Files API · Web Speech API · Rive · Next.js</dd></div>
+    <div><dt>Running cost</dt><dd>$0. Every model call sits on Gemini's free tier.</dd></div>
+  </dl>
+</header>
+
+<main class="wrap">
+
+<section class="prose">
+  <span class="num">01</span>
+  <h2>The idea</h2>
+  <p>When I finish a chapter, I want to talk about it. Podcasts about books are one-way and rarely about <em>my</em> book. Chatbots can answer questions, but a wall of text is a bad companion for something you just read for an hour.</p>
+  <p>So the brief was one line: <strong>hand a book to a character, ask out loud, hear an answer that comes from the book.</strong></p>
+  <p>It started from a sheep. I had a Rive animation of a sheep chewing grass, and the question was whether that chewing could become talking. A sheep that "chews a chapter over" became the show's first host, and the show became Baa-ook Club.</p>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">02</span>
+    <h2>Principles for the voice experience</h2>
+    <p>Before building, I wrote down what a voice product needs that a chat product doesn't.</p>
+  </div>
+  <ul class="principles">
+    <li><b>Grounded, and honest when it isn't</b>Every answer comes from the uploaded book. If the book doesn't cover it, the host says so, in character, and offers the closest thing it does say.</li>
+    <li><b>Written for the ear</b>No markdown, no lists, no headings. Two to four sentences, about 60 words. Spoken answers that run long feel like being lectured.</li>
+    <li><b>The character is the loading state</b>Voice AI has dead air. Each host has to look alive in four states: idle, listening, thinking and speaking, so waiting reads as "they're thinking", not "it's broken".</li>
+    <li><b>Free to run</b>No ElevenLabs, no paid voice agent. If a portfolio project costs money per minute, nobody tries it twice.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">03</span>
+    <h2>The voice pipeline</h2>
+    <p>Baa-ook Club is a cascaded pipeline: speech to text, then a language model, then text to speech. A single speech-to-speech model would be lower latency, but the cascade gave me three things I needed: the whole book as context, a different voice and speaking style per host, and everything on a free tier.</p>
+  </div>
+
+  <div class="diagram" role="img" aria-label="Pipeline: microphone to browser speech recognition, to the ask route which calls Gemini Flash-Lite with the book from the Files API, to the speak route which calls Gemini TTS, to Web Audio, whose loudness drives the Rive character.">
+    <svg viewBox="0 0 1040 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#a99f8f"/></marker>
+      </defs>
+      <g font-size="13" fill="#f3ece0">
+        <rect x="10" y="40" width="150" height="86" rx="12" fill="#2c2720" stroke="#3a342b"/>
+        <text x="85" y="72" text-anchor="middle" font-weight="700">You speak</text>
+        <text x="85" y="94" text-anchor="middle" fill="#a99f8f">or type</text>
+        <text x="85" y="112" text-anchor="middle" fill="#a99f8f">Web Speech API</text>
+
+        <rect x="210" y="20" width="230" height="126" rx="12" fill="#2c2720" stroke="#f2b24c"/>
+        <text x="325" y="50" text-anchor="middle" font-weight="700">/api/ask</text>
+        <text x="325" y="74" text-anchor="middle" fill="#a99f8f">gemini-3.5-flash-lite</text>
+        <text x="325" y="94" text-anchor="middle" fill="#a99f8f">host persona + book PDF</text>
+        <text x="325" y="114" text-anchor="middle" fill="#a99f8f">follow-ups chain on</text>
+        <text x="325" y="132" text-anchor="middle" fill="#a99f8f">previous_interaction_id</text>
+
+        <rect x="490" y="20" width="230" height="126" rx="12" fill="#2c2720" stroke="#f2b24c"/>
+        <text x="605" y="50" text-anchor="middle" font-weight="700">/api/speak</text>
+        <text x="605" y="74" text-anchor="middle" fill="#a99f8f">gemini-3.8-flash-lite-tts</text>
+        <text x="605" y="94" text-anchor="middle" fill="#a99f8f">host voice + style prompt</text>
+        <text x="605" y="114" text-anchor="middle" fill="#a99f8f">first sentence is voiced</text>
+        <text x="605" y="132" text-anchor="middle" fill="#a99f8f">separately, in parallel</text>
+
+        <rect x="770" y="40" width="120" height="86" rx="12" fill="#2c2720" stroke="#3a342b"/>
+        <text x="830" y="72" text-anchor="middle" font-weight="700">Web Audio</text>
+        <text x="830" y="94" text-anchor="middle" fill="#a99f8f">plays + measures</text>
+        <text x="830" y="112" text-anchor="middle" fill="#a99f8f">loudness</text>
+
+        <rect x="920" y="40" width="110" height="86" rx="12" fill="#2c2720" stroke="#ff5a4e"/>
+        <text x="975" y="72" text-anchor="middle" font-weight="700">Rive host</text>
+        <text x="975" y="94" text-anchor="middle" fill="#a99f8f">mouth follows</text>
+        <text x="975" y="112" text-anchor="middle" fill="#a99f8f">the voice</text>
+
+        <rect x="210" y="200" width="230" height="72" rx="12" fill="#221e18" stroke="#3a342b" stroke-dasharray="5 5"/>
+        <text x="325" y="230" text-anchor="middle" font-weight="700">Gemini Files API</text>
+        <text x="325" y="252" text-anchor="middle" fill="#a99f8f">PDF stored 48 h, up to 1,000 pages</text>
+
+        <rect x="10" y="200" width="150" height="72" rx="12" fill="#221e18" stroke="#3a342b" stroke-dasharray="5 5"/>
+        <text x="85" y="230" text-anchor="middle" font-weight="700">/api/upload</text>
+        <text x="85" y="252" text-anchor="middle" fill="#a99f8f">once per book</text>
+      </g>
+      <g stroke="#a99f8f" stroke-width="1.6" fill="none" marker-end="url(#ar)">
+        <path d="M160 83H206"/><path d="M440 83H486"/><path d="M720 83H766"/><path d="M890 83H916"/>
+        <path d="M160 236H206"/><path d="M325 200V150"/>
+      </g>
+      <g font-size="12" fill="#a99f8f">
+        <text x="183" y="74" text-anchor="middle">text</text>
+        <text x="463" y="74" text-anchor="middle">answer</text>
+        <text x="743" y="74" text-anchor="middle">WAV</text>
+        <text x="338" y="180">book</text>
+      </g>
+    </svg>
+  </div>
+  <p class="muted small prose">Every Gemini call happens server-side in a Next.js route, so the API key never reaches the browser.</p>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">04</span>
+    <h2>Latency was the product decision</h2>
+    <p>In voice, latency <em>is</em> the experience. My first build used <code>gemini-3.8-flash</code>, the obvious default. It answered a three-word prompt in 46 seconds, and the first real question about the book took over three minutes. On the free tier it was unusable, however good its answers might have been.</p>
+    <p>So I measured the alternatives on the same prompt and the same book.</p>
+  </div>
+
+  <div class="bars prose" aria-label="Time to answer, in seconds">
+    <div class="bar bad"><span class="name">gemini-3.8-flash · "say hi"</span><span class="track"><span class="fill" style="width:100%"></span></span><span class="val">46.5 s</span></div>
+    <div class="bar bad"><span class="name">gemini-3.6-flash</span><span class="track"><span class="fill" style="width:75%"></span></span><span class="val">503 · busy</span></div>
+    <div class="bar win"><span class="name">gemini-3.5-flash-lite · book Q</span><span class="track"><span class="fill" style="width:8.6%"></span></span><span class="val">3–4 s</span></div>
+    <div class="bar"><span class="name">gemini-3.8-flash-tts · voice</span><span class="track"><span class="fill" style="width:15.2%"></span></span><span class="val">7.1 s</span></div>
+    <div class="bar win"><span class="name">gemini-3.8-flash-lite-tts · voice</span><span class="track"><span class="fill" style="width:9.7%"></span></span><span class="val">4.5 s</span></div>
+  </div>
+  <p class="muted small prose">Measured from my machine on Gemini's free tier, November 2026. Bars are relative to the 46.5 s case.</p>
+
+  <div class="prose">
+    <p>Flash-Lite answered in 3 to 4 seconds, stayed in character, and quoted the right chapter. That made it the default. The lighter TTS model shaved another 2.5 seconds per answer.</p>
+    <h3>Talking before the answer is fully voiced</h3>
+    <p>The biggest perceived win came from a small trick. The app splits each answer into its first sentence and the rest, and sends both to TTS <strong>at the same time</strong>. The short first sentence comes back first, so the host starts talking while the rest is still being generated, and the second clip is usually ready before the first finishes.</p>
+    <div class="callout">
+      <p><strong>Where it stands:</strong> about 3.5 s to the written answer and roughly 5 s more to the first spoken word. That's fine for a thoughtful "let me think about that" podcast host, but not real-time conversation. Streaming TTS is the next step (see <a href="#next">What's next</a>).</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="two">
+    <div class="prose">
+      <span class="num">05</span>
+      <h2>Grounding and persona</h2>
+      <p>Each host gets one system prompt with two halves: a shared set of rules (stay in the book, write for the ear, keep it short, be honest about gaps), and a persona paragraph that changes per host.</p>
+      <p>The book goes to Gemini once through the Files API. Follow-up questions chain on <code>previous_interaction_id</code>, so Gemini keeps the conversation and the document without the app resending them.</p>
+      <p>Switching hosts mid-show keeps the conversation. The new host gets one extra rule: you've taken over the show, so answer as yourself and don't mention the switch.</p>
+    </div>
+    <div>
+      <div class="chat" aria-label="Real answers from a test session">
+        <p class="you"><span class="who">You</span>Who ended up getting caught in the second story, and why?</p>
+        <p class="host"><span class="who">Woolf</span>In the second chapter, The Wolf in Sheep's Clothing, it's the wolf who ends up meeting a sticky end. He disguised himself in a forgotten sheep skin to sneak into the pasture… but the shepherd happened to want mutton broth that evening.</p>
+        <p class="you"><span class="who">You</span>What does the book say about the three little pigs?</p>
+        <p class="host"><span class="who">Woolf</span>Ah, settle down now, the book doesn't mention any pigs at all in these pages. We only have two chapters here… If you have any questions about those characters, I am all ears.</p>
+      </div>
+      <p class="muted small">Real answers from testing, lightly trimmed. The test book was two public-domain Aesop fables.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">06</span>
+    <h2>Four hosts, four different rigs</h2>
+    <p>Users can pick who they talk to. Each host comes with a personality, a default voice and a speaking style, so the same question about the same book gets a different kind of answer: calm, warm, theatrical or punchy.</p>
+  </div>
+  <figure style="margin-top:22px"><img class="shot" src="assets/hosts-lineup.png" alt="The four hosts side by side: Woolf the sheep, Frost the yeti, Silas the bearded storyteller, Pip the pixel blob." width="1632" height="568"><figcaption>All four are Rive community files under CC BY 4.0, by different artists. Credits at the bottom of the page.</figcaption></figure>
+
+  <div class="prose">
+    <h3>One contract, four adapters</h3>
+    <p>The hard part: none of these files were made for this app, and every one exposes different controls. The sheep has no inputs at all. The yeti has on/off switches. The storyteller has a single trigger. The blob has a data-bound view model.</p>
+    <p>So I designed one contract. The app only ever says what the host is doing (<code>idle</code>, <code>listening</code>, <code>thinking</code> or <code>speaking</code>) plus how loud the voice is right now. A small driver per character translates that into whatever its file understands.</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Host</th><th>Voice</th><th>What the file offered</th><th>How it talks, listens and thinks</th></tr></thead>
+      <tbody>
+        <tr><td><span class="host"><img src="assets/thumb-woolf.png" alt="">Woolf</span></td><td>Charon · deep, informative</td><td>Timeline animations only: chewing, breathing, blinking, ear flicks</td><td>The grass-chewing loop is scrubbed forward by voice loudness and settles closed between words. Stops chewing to listen; chews faster while thinking.</td></tr>
+        <tr><td><span class="host"><img src="assets/thumb-frost.png" alt="">Frost</span></td><td>Algenib · gravelly</td><td>State machine: <code>Talk</code>, <code>Hear</code>, <code>success</code>, <code>fail</code></td><td><code>Talk</code> stays on while the voice is audible, with a 250 ms hold so it doesn't flicker between syllables. <code>Hear</code> raises a paw to his ear while the mic is on. Cheers when a book loads; winces on errors.</td></tr>
+        <tr><td><span class="host"><img src="assets/thumb-silas.png" alt="">Silas</span></td><td>Gacrux · mature</td><td>A one-shot <code>speak</code> trigger, plus a 10-frame <code>Talking</code> loop</td><td>Skips the trigger and scrubs the <code>Talking</code> loop directly, so the mouth tracks speech instead of playing a canned clip. Eyebrows move while talking or thinking.</td></tr>
+        <tr><td><span class="host"><img src="assets/thumb-pip.png" alt="">Pip</span></td><td>Orus · firm</td><td>View model: <code>isTalking</code>, <code>mouthWidth</code>, <code>mouthHeight</code>, plus cursor tracking</td><td>Mouth height follows loudness directly, the closest to real lip sync. While thinking it looks around; while listening it looks up. Otherwise it follows your cursor.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="gifs" aria-label="Each host talking">
+    <figure><img src="assets/woolf-talking.gif" alt="Woolf the sheep's jaw moving as it talks" width="300" height="378" loading="lazy"><figcaption><b>Woolf</b> · chew as speech</figcaption></figure>
+    <figure><img src="assets/frost-talking.gif" alt="Frost the yeti talking" width="300" height="378" loading="lazy"><figcaption><b>Frost</b> · Talk switch</figcaption></figure>
+    <figure><img src="assets/silas-talking.gif" alt="Silas the storyteller talking" width="300" height="378" loading="lazy"><figcaption><b>Silas</b> · scrubbed loop</figcaption></figure>
+    <figure><img src="assets/pip-talking.gif" alt="Pip the pixel blob talking" width="300" height="378" loading="lazy"><figcaption><b>Pip</b> · mouth follows loudness</figcaption></figure>
+  </div>
+
+  <div class="prose"><h3>The other states matter as much as talking</h3>
+  <p>Talking only fills a fraction of a voice session. Most of the time the host is waiting, listening or thinking, and those states are what make it feel attended to rather than idle.</p></div>
+  <div class="gifs three" aria-label="Idle, listening and thinking states">
+    <figure><img src="assets/woolf-idle-chewing.gif" alt="Woolf chewing grass slowly while idle" width="300" height="378" loading="lazy"><figcaption><b>Idle.</b> Woolf keeps chewing grass, like the original animation.</figcaption></figure>
+    <figure><img src="assets/frost-listening.gif" alt="Frost cupping an ear while listening" width="300" height="378" loading="lazy"><figcaption><b>Listening.</b> Frost cups an ear while the mic is on.</figcaption></figure>
+    <figure><img src="assets/pip-thinking.gif" alt="Pip looking around while thinking" width="300" height="378" loading="lazy"><figcaption><b>Thinking.</b> Pip looks around while Gemini works.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">07</span>
+    <h2>Behind the scenes</h2>
+    <h3>Turning a chewing sheep into a talking one</h3>
+    <p>The sheep came as a poster: a tall artboard with a "MY SHEEP" title. It had fifteen timeline animations with Turkish names (<code>gevis</code>, chewing; <code>nefes</code>, breath; <code>kirp</code>, blink; <code>kulak</code>, ear) and no state machine inputs. I inspected it in the browser, listed every animation and its length, and worked out which ones could carry the character.</p>
+  </div>
+  <div class="two" style="margin-top:20px">
+    <figure><img class="shot" src="assets/bts-sheep-poster-crop.png" alt="The full sheep artboard with the MY SHEEP title, and a dashed outline around the part the app shows." width="1000" height="1498" loading="lazy"><figcaption>The full artboard, and the crop the app shows. Rive's layout bounds place an artboard on the canvas rather than crop it, so the app draws the artboard larger than the canvas and offsets it.</figcaption></figure>
+    <div>
+      <figure><img class="shot" src="assets/bts-chew-frames.png" alt="Six frames of the chewing loop at 0, 0.17, 0.33, 0.5, 0.67 and 0.83 seconds, showing the jaw shifting side to side." width="1800" height="356" loading="lazy"><figcaption>One second of <code>gevis</code>, the chewing loop. Rather than play it, the app scrubs it: the louder the voice, the faster the jaw moves through the cycle, and it eases back to closed in the gaps between words.</figcaption></figure>
+<pre><span class="c">// Woolf's driver, simplified. Called every frame.</span>
+<span class="k">if</span> (mode === <span class="k">"speaking"</span>) {
+  <span class="k">if</span> (level &gt; 0.04) phase += dt * (1.1 + level * 3.5);
+  <span class="k">else</span> phase += (Math.round(phase) - phase) * dt * 12; <span class="c">// close between words</span>
+} <span class="k">else</span> {
+  phase += dt * (mode === <span class="k">"thinking"</span> ? 1.15 : 0.6); <span class="c">// chewing grass</span>
+}
+rive.scrub(<span class="k">"gevis"</span>, phase % 1);</pre>
+    </div>
+  </div>
+
+  <div class="prose">
+    <h3>Finding hosts that could talk</h3>
+    <p>For more hosts, I searched the Rive community for CC BY characters with mouth or talking controls, previewed six, and checked each file's license and controls before building anything. A red-haired avatar with twelve proper mouth shapes would have given the best lip sync, but it could only be downloaded with a Rive login, so it's parked for later.</p>
+    <h3>Checking the work without watching it</h3>
+    <p>Every GIF on this page was recorded straight from the app's canvas: a dev-only route saved the frames and encoded them. Before using each GIF, I decoded it and counted how many pixels changed between frames. That caught two silent failures that looked fine in a still screenshot: a sheep that wasn't animating at all, and a Pip whose head ignored the values I was setting. Pip's head turned out to follow pointer events, so its driver now steers its gaze with synthetic pointer moves.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">08</span>
+    <h2>The product, end to end</h2>
+  </div>
+  <div class="two" style="margin-top:8px">
+    <figure><img class="shot" src="assets/ui-landing.png" alt="The landing state: host picker with four hosts, Woolf on stage, and an empty show notes panel." width="1920" height="1230" loading="lazy"><figcaption>Landing. Pick a host, drop in a PDF. The status pill moves through Ready, Listening to you, Thinking and On air.</figcaption></figure>
+    <figure style="max-width:360px;margin:0 auto"><img class="shot" src="assets/ui-mobile-pip.png" alt="The app on a phone, Pip on air, with all four hosts in one row." width="780" height="1688" loading="lazy"><figcaption>On a phone, the picker compresses to one row and the show notes move below.</figcaption></figure>
+  </div>
+  <div class="prose" style="margin-top:28px">
+    <ul class="clean">
+      <li><strong>Upload.</strong> Drag in a PDF. The host reads it and opens the episode by naming the book and inviting questions.</li>
+      <li><strong>Ask.</strong> Tap the mic (Chrome and Edge's built-in speech recognition, free) or type.</li>
+      <li><strong>Listen.</strong> The stage glows red and the status reads On air. Stop cuts the host off; a new question also interrupts.</li>
+      <li><strong>Show notes.</strong> The transcript names which host said what, and any answer can be replayed.</li>
+      <li><strong>Voices.</strong> By default each host has its own voice, and a menu can override it with any of four deep Gemini voices.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <span class="num">09</span>
+    <h2>What I chose not to do</h2>
+  </div>
+  <div class="cut">
+    <div><b>The "best" model</b>gemini-3.8-flash is the stronger model on paper, but at 46 s or more per answer the product didn't work. A fast, slightly smaller model that answers while you're still engaged beats a better one you've given up on.</div>
+    <div><b>Paid voice platforms</b>ElevenLabs-style agents give great lip-sync timing data, but they cost money per minute. Gemini TTS on the free tier sounds deep and natural enough, and the per-host style prompt does a lot of the character work.</div>
+    <div><b>Characters without a mouth</b>A jazz guitarist file I had was beautiful but had no mouth animation, and an aquarium fish lived inside a whole tank scene. I picked files whose controls could honestly carry speech.</div>
+    <div><b>Fake lip sync</b>Rather than play a canned talking clip, every host's mouth is driven by the actual loudness of the audio being played, so silence looks like silence.</div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="prose">
+    <span class="num">10</span>
+    <h2>What's next</h2>
+    <ul class="clean">
+      <li><strong>Streaming speech.</strong> Stream TTS audio as it's generated, to cut the roughly 5 s gap before the first word to under 2 s.</li>
+      <li><strong>Real visemes.</strong> Map words to mouth shapes using a host with a proper viseme set, like the twelve-shape avatar I had to park.</li>
+      <li><strong>Barge-in.</strong> Let the listener interrupt by speaking, not just by tapping Stop.</li>
+      <li><strong>Citations you can see.</strong> Show the page an answer came from next to the transcript line.</li>
+      <li><strong>A grounding eval.</strong> A small set of questions with known answers (including questions about things not in the book) to check honesty whenever the model changes.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="prose">
+  <span class="num">11</span>
+  <h2>How I worked with AI</h2>
+  <p>I built this pairing with Claude Code. It wrote the code: the API routes, the character drivers, the capture tooling. I did the parts that decide whether it's any good:</p>
+  <ul class="clean">
+    <li>the brief, the show format and the four host personalities</li>
+    <li>choosing the stack under a hard constraint (free to run)</li>
+    <li>picking characters, and judging each one in every state</li>
+    <li>deciding latency mattered more than model quality, and acting on the measurements</li>
+  </ul>
+  <p>The loop was: decide → build → measure or record → critique → fix. Measuring things like answer time and GIF frame changes, rather than eyeballing them, is what caught the slow model and the silently frozen characters.</p>
+</section>
+
+<section id="build" class="prose">
+  <span class="num">12</span>
+  <h2>Build your own</h2>
+  <p>The code is public at <a href="https://github.com/shriy-singh/baa-ook-club">github.com/shriy-singh/baa-ook-club</a>, without any API keys.</p>
+  <ol class="clean">
+    <li>Get a free Gemini API key at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>.</li>
+    <li>Clone the repo, put the key in <code>.env.local</code> as <code>GEMINI_API_KEY=…</code>, then run <code>npm install</code> and <code>npm run dev</code>.</li>
+    <li>Open it in Chrome or Edge, pick a host and drop in a PDF.</li>
+    <li>To add a host: drop a <code>.riv</code> file in <code>public/characters</code>, add an entry in <code>lib/characters.ts</code> (persona, voice, crop), and write a small driver in <code>components/Avatar.tsx</code> that maps the four states onto that file's controls.</li>
+  </ol>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p><strong>Credits.</strong> Characters from the Rive community, each under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>: Woolf is <a href="https://rive.app/community/files/28304-53466-kuzu-kuzu-mee/">Kuzu Kuzu Mee</a> by musaadanur; Frost is <a href="https://rive.app/community/files/5628-11215-wave-hear-and-talk/">Wave, Hear and talk</a> by japarj (a remix of JcToon's Login Screen Character); Silas is <a href="https://rive.app/community/files/4532-9211-character-face-animation/">Character face animation</a> by ak2665622; Pip is <a href="https://rive.app/marketplace/28249-53356-rive-avatar/">Rive Avatar</a> by nasmith. Names, personalities and voices were added for this project; the artwork and animation are the artists' own. The test book is two Aesop fables, which are in the public domain.</p>
+  <p>Built with Gemini (Google), Rive and Next.js. A personal project, not affiliated with any of them.</p>
+</footer>
+
+</body>
+</html>
