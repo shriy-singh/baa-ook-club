@@ -1,0 +1,26 @@
+/* Extension pages load the fonts from bundled files instead of next/font. */
+:root {
+  --font-display: "Bowlby One";
+  --font-body: "Archivo";
+}
+
+.key-room { min-height: 100vh; display: grid; place-items: center; padding: 32px 16px; }
+.key-card {
+  width: min(100%, 520px); padding: 28px 24px; background: var(--paper);
+  border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 6px 8px 0 var(--shade);
+}
+.key-card > img { border-radius: 20px; border: 2px solid var(--ink); display: block; margin: 0 auto 12px; }
+.key-card h1 { text-align: center; font-size: clamp(32px, 8vw, 44px); margin-bottom: 14px; }
+.key-lede { margin: 0 0 16px; font-size: 17px; text-align: center; }
+.key-steps { margin: 0 0 18px; padding-left: 22px; }
+.key-steps li { margin-bottom: 6px; }
+.key-steps a { color: var(--ink); font-weight: 700; }
+.key-form { display: grid; gap: 8px; margin-bottom: 12px; }
+.key-form label { font-weight: 800; font-size: 14px; }
+.key-form input {
+  width: 100%; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 14px;
+  background: var(--paper-2); font-size: 16px; font-family: inherit;
+}
+.key-form .send { justify-self: start; }
+.key-note { margin: 14px 0 0; font-size: 13px; color: var(--ink-soft); }
+.key-actions { display: flex; gap: 18px; margin-top: 14px; }

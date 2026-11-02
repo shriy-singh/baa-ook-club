@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "types": ["chrome", "vite/client"], "paths": { "@/*": ["../*"] } },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "../types.d.ts"]
+}
