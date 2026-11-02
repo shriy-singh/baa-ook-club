@@ -49,8 +49,21 @@ about 2.5 seconds slower per answer.
 
 ## Deploying
 
-It runs on Vercel as is. Add `GEMINI_API_KEY` in the project settings. Vercel caps uploads to API routes at about
-4.5 MB, so bigger PDFs only work locally unless uploads go straight from the browser to Gemini.
+It runs on Vercel as is: import the GitHub repo at https://vercel.com/new, add `GEMINI_API_KEY` as an environment
+variable, and deploy. Every push to `main` redeploys.
+
+Books never pass through the server, so Vercel's ~4.5 MB request limit doesn't apply: `/api/upload` opens a
+resumable Gemini upload with the key, the browser sends the PDF straight to Google, and the server then confirms the
+upload (Google's success reply has no CORS header, so the browser can't read it). PDFs can be up to 50 MB.
+
+### Installing on a phone
+
+The site is installable: it has a web app manifest, icons (including a maskable one for Android) and a service worker
+that shows a friendly offline page. On Android, Chrome offers "Install app"; on iPhone, use Share → Add to Home Screen.
+The same manifest is what a Play Store wrapper (Trusted Web Activity, e.g. via PWABuilder) is built from.
+
+Everyone using a deployment shares its Gemini key's free-tier quota. On the free tier there is no bill, but voice can
+run out for the day if many people use it.
 
 ## Credits
 

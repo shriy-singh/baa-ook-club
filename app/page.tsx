@@ -12,6 +12,29 @@ function splitFirstSentence(text: string) {
   return match ? [match[1], match[2]] : [text];
 }
 
+async function postJson(url: string, body: unknown) {
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error);
+  return data;
+}
+
+// The server opens the upload with its key; the PDF itself goes straight from the browser to Google.
+async function uploadBook(file: File): Promise<{ uri: string; mimeType: string }> {
+  const { uploadUrl } = await postJson("/api/upload", { action: "start", name: file.name, size: file.size, mimeType: file.type });
+  try {
+    await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize" },
+      body: file.slice(0, file.size, ""), // the type was already declared at "start"
+    });
+  } catch {
+    // Google's success reply has no CORS header, so the browser reports an error even when the
+    // upload worked. The server checks what actually arrived.
+  }
+  return postJson("/api/upload", { action: "finish", uploadUrl });
+}
+
 // Chrome and Edge ship speech recognition under a prefixed name.
 function getRecognition(): any {
   if (typeof window === "undefined") return null;
@@ -182,11 +205,7 @@ export default function Page() {
     setCaption("");
     previousId.current = undefined;
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const data = await uploadBook(file);
       const next = { name: file.name, uri: data.uri, mimeType: data.mimeType };
       setBook(next);
       setStatus("ready");
