@@ -1,5 +1,5 @@
-// How the Studio talks to Gemini. The web app goes through its own API routes (the deployment's key
-// stays on the server); the browser extension calls Gemini directly with the visitor's own key.
+// How the Studio talks to Gemini. The website goes through its own API routes (free trial on the site's key,
+// or the visitor's own key); the browser extension calls Gemini directly with the visitor's own key.
 import { GoogleGenAI } from "@google/genai";
 import {
   DEFAULT_TEXT_MODEL,
@@ -20,36 +20,55 @@ export type Backend = {
   speak(args: SpeakArgs): Promise<ArrayBuffer>;
 };
 
-async function postJson(url: string, body: unknown) {
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error);
-  return data;
+/** The website's free trial is over (or not offered in this region): the visitor needs their own key. */
+export class NeedKeyError extends Error {
+  constructor(message: string, readonly reason: "region" | "books" | "asks") {
+    super(message);
+  }
 }
 
-export const serverBackend: Backend = {
-  // The server opens the upload with its key; the PDF itself goes straight from the browser to Google.
-  async upload(file) {
-    const { uploadUrl } = await postJson("/api/upload", { action: "start", name: file.name, size: file.size, mimeType: file.type });
-    try {
-      await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize" },
-        body: file.slice(0, file.size, ""), // the type was already declared at "start"
-      });
-    } catch {
-      // Google's success reply has no CORS header, so the browser reports an error even when the
-      // upload worked. The server checks what actually arrived.
-    }
-    return postJson("/api/upload", { action: "finish", uploadUrl });
-  },
-  ask: (args) => postJson("/api/ask", args),
-  async speak(args) {
-    const res = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(args) });
-    if (!res.ok) throw new Error((await res.json()).error || "The voice did not come through.");
-    return res.arrayBuffer();
-  },
-};
+async function fail(res: Response): Promise<never> {
+  const data = (await res.json().catch(() => ({}))) as { error?: string; needKey?: boolean; reason?: NeedKeyError["reason"] };
+  if (data.needKey && data.reason) throw new NeedKeyError(data.error ?? "Add your own Gemini key to keep going.", data.reason);
+  throw new Error(data.error || "Something went wrong. Try again.");
+}
+
+/**
+ * The website: requests go through its API routes. Without `ownKey` they use the visitor's free trial on
+ * the site's key; with it, the visitor's key travels with each request (never stored on the server).
+ */
+export function serverBackend(ownKey?: string): Backend {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (ownKey) headers["x-gemini-key"] = ownKey;
+  const post = (url: string, body: unknown) => fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  const postJson = async (url: string, body: unknown) => {
+    const res = await post(url, body);
+    return res.ok ? res.json() : fail(res);
+  };
+
+  return {
+    // The server opens the upload; the PDF itself goes straight from the browser to Google.
+    async upload(file) {
+      const { uploadUrl } = await postJson("/api/upload", { action: "start", name: file.name, size: file.size, mimeType: file.type });
+      try {
+        await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize" },
+          body: file.slice(0, file.size, ""), // the type was already declared at "start"
+        });
+      } catch {
+        // Google's success reply has no CORS header, so the browser reports an error even when the
+        // upload worked. The server checks what actually arrived.
+      }
+      return postJson("/api/upload", { action: "finish", uploadUrl });
+    },
+    ask: (args) => postJson("/api/ask", args),
+    async speak(args) {
+      const res = await post("/api/speak", args);
+      return res.ok ? res.arrayBuffer() : fail(res);
+    },
+  };
+}
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

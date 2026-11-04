@@ -157,6 +157,60 @@ h2 { margin: 0; font-family: var(--font-display), sans-serif; font-weight: 400; 
 button.swap { border: 0; background: none; padding: 0; color: inherit; }
 .swap { position: relative; align-self: flex-start; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
+/* "What this site knows about you" page. */
+.data-page { max-width: 960px; margin: 0 auto; padding: 28px 16px 56px; display: grid; gap: 22px; }
+.data-page h1 {
+  margin: 0; font-family: var(--font-display), sans-serif; font-weight: 400; font-size: clamp(30px, 5.5vw, 48px); line-height: 1.05;
+  color: var(--paper); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 3px 4px 0 var(--shade);
+}
+.data-back { font-weight: 700; color: var(--ink); }
+.data-lede { margin: 0; font-size: 18px; max-width: 720px; }
+.data-card {
+  background: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: 5px 7px 0 var(--shade); min-width: 0;
+}
+.data-card h2 { margin-bottom: 8px; font-size: 21px; }
+.data-card ul { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 8px; }
+.data-card p { margin: 0 0 10px; }
+.data-card a { color: var(--ink); font-weight: 700; }
+.data-card code { background: var(--paper-2); padding: 1px 6px; border-radius: 6px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.data-table th, .data-table td { text-align: left; vertical-align: top; padding: 9px 10px; border-top: 2px dashed #e3d6c2; }
+.data-table th { width: 22%; font-weight: 800; }
+.data-table td:nth-child(2) { width: 36%; font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .data-table, .data-table tbody, .data-table tr, .data-table th, .data-table td { display: block; width: auto; }
+  .data-table tr { border-top: 2px dashed #e3d6c2; padding: 8px 0; }
+  .data-table th, .data-table td { border: 0; padding: 2px 0; }
+}
+
+/* "Bring your own key" screen (website and extension). */
+.key-room { min-height: 100vh; display: grid; place-items: center; padding: 32px 16px; }
+.key-card {
+  width: min(100%, 520px); padding: 28px 24px; background: var(--paper);
+  border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 6px 8px 0 var(--shade);
+}
+.key-card > img { border-radius: 20px; border: 2px solid var(--ink); display: block; margin: 0 auto 12px; }
+.key-card h1 { text-align: center; font-size: clamp(32px, 8vw, 44px); margin-bottom: 14px; }
+.key-lede { margin: 0 0 16px; font-size: 17px; text-align: center; }
+.key-steps { margin: 0 0 18px; padding-left: 22px; }
+.key-steps li { margin-bottom: 6px; }
+.key-steps a { color: var(--ink); font-weight: 700; }
+.key-form { display: grid; gap: 8px; margin-bottom: 12px; }
+.key-form label { font-weight: 800; font-size: 14px; }
+.key-form input {
+  width: 100%; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 14px;
+  background: var(--paper-2); font-size: 16px; font-family: inherit;
+}
+.key-form .send { justify-self: start; }
+.key-note { margin: 14px 0 0; font-size: 13px; color: var(--ink-soft); }
+.key-actions { display: flex; gap: 18px; margin-top: 14px; }
+.key-note a { color: var(--ink); font-weight: 700; }
+.key-reason { margin: 0 0 12px; padding: 10px 14px; background: var(--world); border: 2px solid var(--ink); border-radius: 14px; font-weight: 600; text-align: center; }
+.trial-note { margin: 0; padding: 10px 12px; border-radius: 14px; background: var(--paper-2); font-size: 14px; }
+.trial-note button { margin-left: 4px; }
+.data-link { display: block; margin-top: 6px; font-size: 14px; font-weight: 700; color: var(--ink); text-underline-offset: 3px; }
+
 @media (max-width: 860px) {
   .studio { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "stage" "notes"; }
   .notes { position: static; max-height: none; }

@@ -1,16 +1,30 @@
-import { useState } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import { checkKey } from "@/lib/backend";
-import { ensureGeminiAccess, forgetKey, saveKey } from "./keyStore";
+
+export type KeyStore = {
+  save(key: string): Promise<void>;
+  forget(): Promise<void>;
+  /** Runs inside the Save click, e.g. to ask the browser for permission to reach Gemini. */
+  beforeSave?(): Promise<boolean>;
+};
 
 type Props = {
+  store: KeyStore;
   hasKey: boolean;
   onSaved: (key: string) => void;
   onCancel?: () => void;
+  cancelLabel?: string;
   onForgotten: () => void;
+  /** Why the key is needed right now (website: trial used up, or region). */
+  reason?: string;
+  /** Where the key is kept and where it goes. */
+  note: ReactNode;
 };
 
-// First-run screen: each person brings their own free Gemini key, so nobody shares a quota.
-export default function KeySetup({ hasKey, onSaved, onCancel, onForgotten }: Props) {
+// "Bring your own key" screen, shared by the website and the extension.
+export default function KeySetup({ store, hasKey, onSaved, onCancel, cancelLabel = "Back to the club", onForgotten, reason, note }: Props) {
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -22,10 +36,9 @@ export default function KeySetup({ hasKey, onSaved, onCancel, onForgotten }: Pro
     setError("");
     setBusy(true);
     try {
-      // Ask for access first: Firefox only allows the prompt directly inside the click.
-      if (!(await ensureGeminiAccess())) throw new Error("Baa-ook Club needs permission to talk to Gemini to work.");
+      if (store.beforeSave && !(await store.beforeSave())) throw new Error("Baa-ook Club needs permission to talk to Gemini to work.");
       await checkKey(key);
-      await saveKey(key);
+      await store.save(key);
       onSaved(key);
     } catch (err) {
       setError((err as Error).message);
@@ -35,18 +48,19 @@ export default function KeySetup({ hasKey, onSaved, onCancel, onForgotten }: Pro
   };
 
   const forget = async () => {
-    await forgetKey();
+    await store.forget();
     onForgotten();
   };
 
   return (
     <main className="key-room">
       <section className="key-card">
-        <img src="/icons/icon-128.png" alt="" width={84} height={84} />
+        <img src="/icons/icon-192.png" alt="" width={84} height={84} />
         <h1>Baa-ook Club</h1>
+        {reason && <p className="key-reason">{reason}</p>}
         <p className="key-lede">
-          Hand a book to Woolf and friends, and talk it through out loud. The hosts think and speak with Google's Gemini,
-          using <strong>your own free API key</strong>.
+          The hosts think and speak with Google's Gemini. With <strong>your own free API key</strong>, you can keep
+          chatting about as many books as Gemini's free tier allows.
         </p>
 
         <ol className="key-steps">
@@ -79,20 +93,17 @@ export default function KeySetup({ hasKey, onSaved, onCancel, onForgotten }: Pro
         {error && <p className="error" role="alert">{error}</p>}
 
         <p className="key-note">
-          Your key is stored only in this browser and is only ever sent to Google. Books you upload go to Gemini, which
-          keeps them for 48 hours. On the free tier Google may use what you send to improve its products, so don't upload
-          anything sensitive. Gemini requires users to be 18 or older.{" "}
+          {note} On the free tier Google may use what you send to improve its products, so don't upload anything
+          sensitive. Gemini requires users to be 18 or older.{" "}
           <a href="https://shriy-singh.github.io/baa-ook-club/privacy.html" target="_blank" rel="noreferrer">
             Privacy policy
           </a>
         </p>
 
-        {hasKey && (
-          <div className="key-actions">
-            {onCancel && <button className="swap" onClick={onCancel}>Back to the club</button>}
-            <button className="swap" onClick={forget}>Forget my key</button>
-          </div>
-        )}
+        <div className="key-actions">
+          {onCancel && <button className="swap" onClick={onCancel}>{cancelLabel}</button>}
+          {hasKey && <button className="swap" onClick={forget}>Forget my key</button>}
+        </div>
       </section>
     </main>
   );

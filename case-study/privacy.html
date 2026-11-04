@@ -35,7 +35,7 @@
 <body>
 <main>
   <h1>Privacy policy</h1>
-  <p class="meta">Baa-ook Club browser extension and website · Last updated 4 November 2026</p>
+  <p class="meta">Baa-ook Club browser extension and website · Last updated 4 November 2026 (website free trial and data page added)</p>
 
   <div class="box">
     <p><strong>In short:</strong> Baa-ook Club has no servers of its own that store your data, no accounts, no analytics and no ads. To read your book and answer you, it sends your book and your questions to Google's Gemini API. Please don't upload anything sensitive, confidential or personal.</p>
@@ -58,13 +58,19 @@
   <p>If your key uses Gemini's free (unpaid) tier, Google says it uses the content you submit to provide, improve and develop its products, and that human reviewers may read it (after disconnecting it from your account and key). That is why you shouldn't upload sensitive, confidential or personal documents. If you are in the European Economic Area, Switzerland or the United Kingdom, Google applies its paid-service data terms to free use as well. If your key has billing enabled, Google's paid-service terms apply.</p>
 
   <h2>The website version</h2>
-  <p>The website works the same way, except that its server sends requests to Gemini using the site's own key, so you don't need one. The server passes your book and questions to Gemini and returns the answers; it does not store them. The hosting provider (Vercel) keeps standard technical request logs. The website remembers nothing about you between visits.</p>
+  <p>The website works the same way, with two differences.</p>
+  <ul>
+    <li><strong>Free trial on the site's key.</strong> Each browser can use 3 books a month on the site's own Gemini key. To count them, the site sets one cookie, <code>bc_trial</code>, holding only the month, how many free books you've used and how many questions you've asked about the current one. It's signed so it can't be edited, contains no name or identifier, and resets each month.</li>
+    <li><strong>Your country, not stored.</strong> Our host, Vercel, works out your country from your IP address on each request. The site uses it only to decide whether the free trial is allowed where you are (Gemini's terms don't allow free shared keys for public sites in the EEA, Switzerland or the UK; visitors there bring their own key). It isn't saved.</li>
+    <li><strong>Your own key, if you add one.</strong> It's kept in your browser's local storage and sent to the site's server with each request, which passes it straight to Google and never stores or logs it. "Forget my key" removes it.</li>
+  </ul>
+  <p>The server passes your book and questions to Gemini and returns the answers; it does not store them. Vercel keeps standard short-lived technical request logs (time, page, IP address). You can see, live, what your browser shares and what the site keeps on <a href="https://baa-ook-book-club.vercel.app/your-data">What this site knows about you</a>.</p>
 
   <h2>What we never do</h2>
   <ul>
-    <li>No accounts, sign-ups, analytics, tracking or advertising.</li>
+    <li>No accounts, sign-ups, analytics, tracking, fingerprinting or advertising.</li>
     <li>No selling or sharing of data with anyone other than Google, as described above.</li>
-    <li>No storing of your books, questions or key on any server we run.</li>
+    <li>No storing of your books, questions or key on any server we run. The only thing kept is the small trial cookie described above.</li>
   </ul>
 
   <h2>Age</h2>

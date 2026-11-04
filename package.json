@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start -p 3210",
     "ext:build": "vite build --config extension/vite.config.ts && node extension/build.mjs",
-    "ext:source": "git archive --format=zip -o dist-extension/baa-ook-club-source-1.0.0.zip HEAD"
+    "ext:source": "git archive --format=zip -o dist-extension/baa-ook-club-source-1.0.1.zip HEAD"
   },
   "dependencies": {
     "@google/genai": "^2.32.0",

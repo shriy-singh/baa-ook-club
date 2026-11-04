@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Avatar, { type AvatarMode, type Reaction } from "@/components/Avatar";
-import type { Backend } from "@/lib/backend";
+import { NeedKeyError, type Backend } from "@/lib/backend";
 import { CHARACTERS, DEFAULT_CHARACTER, INK, PAPER, VOICES, getCharacter, mix, type CharacterId } from "@/lib/characters";
 
 type Line = { who: "you" | "host"; host?: CharacterId; text: string };
@@ -22,12 +22,18 @@ function getRecognition(): any {
 
 type Props = {
   backend: Backend;
-  /** Shown in the extension, where each person brings their own Gemini key. */
+  /** Offers a "Change Gemini key" link when people can bring their own key. */
   onChangeKey?: () => void;
+  /** The website's free trial ran out (or isn't offered here): ask for the visitor's own key. */
+  onNeedKey?: (err: NeedKeyError) => void;
+  /** Called after a book is ready, e.g. to refresh how many free books are left. */
+  onBookLoaded?: () => void;
+  /** Extra line in the show notes, e.g. the free-trial status. */
+  notice?: ReactNode;
 };
 
 // The whole Baa-ook Club screen, shared by the web app and the browser extension.
-export default function Studio({ backend, onChangeKey }: Props) {
+export default function Studio({ backend, onChangeKey, onNeedKey, onBookLoaded, notice }: Props) {
   const [hostId, setHostId] = useState<CharacterId>(DEFAULT_CHARACTER);
   const [book, setBook] = useState<Book | null>(null);
   const [status, setStatus] = useState<"empty" | "reading" | "ready">("empty");
@@ -69,6 +75,15 @@ export default function Studio({ backend, onChangeKey }: Props) {
     setMode("idle");
     setError(message);
     react("fail");
+  };
+  // Free trial used up: hand over to the key screen instead of showing an error.
+  const failWith = (err: unknown, prefix = "") => {
+    if (err instanceof NeedKeyError && onNeedKey) {
+      setMode("idle");
+      onNeedKey(err);
+      return;
+    }
+    fail(prefix + (err as Error).message);
   };
 
   // Browsers only allow audio after a click, so this runs inside click handlers.
@@ -160,10 +175,10 @@ export default function Studio({ backend, onChangeKey }: Props) {
       try {
         await speak(data.text, speaker);
       } catch (err) {
-        fail(`Couldn't play the voice: ${(err as Error).message}`);
+        failWith(err, "Couldn't play the voice: ");
       }
     } catch (err) {
-      fail((err as Error).message);
+      failWith(err);
     }
   };
 
@@ -184,10 +199,11 @@ export default function Studio({ backend, onChangeKey }: Props) {
       setBook(next);
       setStatus("ready");
       react("success");
+      onBookLoaded?.();
       await ask(undefined, next);
     } catch (err) {
       setStatus(book ? "ready" : "empty");
-      fail((err as Error).message);
+      failWith(err);
     }
   };
 
@@ -344,6 +360,7 @@ export default function Studio({ backend, onChangeKey }: Props) {
             {VOICES.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
           </select>
         </div>
+        {notice}
         {lines.length === 0 ? (
           <p className="muted small">The conversation will appear here.</p>
         ) : (

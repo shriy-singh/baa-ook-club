@@ -2,8 +2,8 @@ import { StrictMode, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Studio from "@/components/Studio";
 import { directBackend } from "@/lib/backend";
-import KeySetup from "./KeySetup";
-import { loadKey } from "./keyStore";
+import KeySetup, { type KeyStore } from "@/components/KeySetup";
+import { ensureGeminiAccess, forgetKey, loadKey, saveKey } from "./keyStore";
 import "@fontsource/bowlby-one/400.css";
 import "@fontsource/archivo/400.css";
 import "@fontsource/archivo/500.css";
@@ -11,6 +11,9 @@ import "@fontsource/archivo/700.css";
 import "@fontsource/archivo/800.css";
 import "@/app/globals.css";
 import "./extension.css";
+
+const store: KeyStore = { save: saveKey, forget: forgetKey, beforeSave: ensureGeminiAccess };
+const NOTE = "Your key is stored only in this browser and is only ever sent to Google. Books you upload go to Gemini, which keeps them for 48 hours.";
 
 function App() {
   const [key, setKey] = useState<string | null>(null); // null while loading
@@ -24,6 +27,8 @@ function App() {
   if (!backend || editing) {
     return (
       <KeySetup
+        store={store}
+        note={NOTE}
         hasKey={!!key}
         onSaved={(k) => {
           setKey(k);
