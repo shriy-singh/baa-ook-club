@@ -20,8 +20,12 @@ const store: KeyStore = {
   save: async (k) => localStorage.setItem(STORAGE_KEY, k),
   forget: async () => localStorage.removeItem(STORAGE_KEY),
 };
-const NOTE =
-  "Your key is kept only in this browser. It's sent to this site's server with each request, which passes it straight to Google and never stores or logs it.";
+const NOTE = (
+  <>
+    Your key is kept only in this browser. It's sent to this site's server with each request, which passes it straight
+    to Google and never stores or logs it. <a href="/your-data">See what this site knows about you</a>.
+  </>
+);
 
 const REASONS: Record<NeedKeyError["reason"], string> = {
   region: "In your region, Gemini's rules don't allow free shared keys for public sites, so the club needs your own free key.",
