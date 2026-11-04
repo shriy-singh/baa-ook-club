@@ -46,7 +46,7 @@ Current result: 0 errors, 3 warnings, explained in the reviewer notes below.
 **Privacy policy:** https://shriy-singh.github.io/baa-ook-club/privacy.html
 (The form may ask you to paste the policy text instead of a link; copy it from that page.)
 
-**License:** choose one in the form (the repo needs a matching LICENSE file). The characters stay under their artists' CC BY 4.0 licences either way.
+**License:** MIT License (matches `LICENSE` in the repo). The characters stay under their artists' CC BY 4.0 licences; that's stated in the description and in `LICENSE`.
 
 **Screenshot captions:**
 1. Bring your own free Gemini key; it stays in your browser.

@@ -86,4 +86,8 @@ Names, personalities and voices were added for this project; the artwork and ani
 - Silas: [Character face animation](https://rive.app/community/files/4532-9211-character-face-animation/) by ak2665622
 - Pip: [Rive Avatar](https://rive.app/marketplace/28249-53356-rive-avatar/) by nasmith
 
+## Licence
+
+The code is released under the [MIT licence](LICENSE). The character animations in `public/characters/` are not: they stay under their artists' CC BY 4.0 licences (see Credits).
+
 A personal project, not affiliated with Google, Rive or the artists above.
