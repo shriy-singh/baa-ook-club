@@ -67,6 +67,15 @@ The same manifest is what a Play Store wrapper (Trusted Web Activity, e.g. via P
 Everyone using a deployment shares its Gemini key's free-tier quota. On the free tier there is no bill, but voice can
 run out for the day if many people use it.
 
+## Browser extension (bring your own key)
+
+The same club also ships as a browser extension where each person uses their own free Gemini key, so nobody shares
+a quota. `npm run ext:build` builds `dist-extension/firefox` and `dist-extension/chrome` (for Edge and Opera) plus
+store-ready zips. To try it: in Firefox open `about:debugging` > This Firefox > Load Temporary Add-on and pick
+`dist-extension/firefox/manifest.json`; in Edge open `edge://extensions`, turn on Developer mode and Load unpacked
+`dist-extension/chrome`. Store listing text, screenshots and reviewer notes are in [`extension/STORE.md`](extension/STORE.md).
+Privacy policy: https://shriy-singh.github.io/baa-ook-club/privacy.html
+
 ## Credits
 
 The characters are Rive community files, each under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

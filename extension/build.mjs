@@ -34,7 +34,8 @@ for (const [browser, manifest] of Object.entries(manifests)) {
   fs.rmSync(dir, { recursive: true, force: true });
   fs.cpSync(pages, dir, { recursive: true });
   fs.cpSync(path.join(root, "public", "characters"), path.join(dir, "characters"), { recursive: true });
-  fs.copyFileSync(path.join(root, "public", "rive.wasm"), path.join(dir, "rive.wasm"));
+  // The official Rive runtime, straight from the npm package (unmodified).
+  fs.copyFileSync(path.join(root, "node_modules", "@rive-app", "canvas", "rive.wasm"), path.join(dir, "rive.wasm"));
   fs.cpSync(path.join(here, "icons"), path.join(dir, "icons"), { recursive: true });
   fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
 

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baa-ook Club · Privacy policy</title>
+<meta name="description" content="What the Baa-ook Club browser extension and website do with your data.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<meta name="theme-color" content="#c9d6a5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Bowlby+One&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #2e2622; --ink-soft: #5d514a; --paper: #fdf8ef; --paper-2: #f5ecdd; --sage: #c9d6a5; --shade: #74755d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--sage); color: var(--ink); font: 400 17px/1.65 Archivo, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  main {
+    max-width: 760px; margin: 40px auto; padding: 28px 24px 34px; background: var(--paper);
+    border: 2px solid var(--ink); border-radius: 22px; box-shadow: 6px 8px 0 var(--shade);
+  }
+  @media (max-width: 800px) { main { margin: 16px; } }
+  h1, h2 { font-family: "Bowlby One", sans-serif; font-weight: 400; line-height: 1.1; letter-spacing: .01em; }
+  h1 { font-size: clamp(30px, 6vw, 42px); margin: 0 0 6px; }
+  h2 { font-size: 22px; margin: 32px 0 10px; }
+  p, li { margin: 0 0 12px; }
+  ul { padding-left: 22px; margin: 0 0 12px; }
+  a { color: var(--ink); font-weight: 600; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  .meta { color: var(--ink-soft); font-size: 15px; margin-bottom: 20px; }
+  .box { background: var(--paper-2); border: 2px solid var(--ink); border-radius: 16px; padding: 14px 18px; margin: 18px 0; }
+  .box p:last-child { margin: 0; }
+  .back { display: inline-block; margin-top: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Privacy policy</h1>
+  <p class="meta">Baa-ook Club browser extension and website · Last updated 4 November 2026</p>
+
+  <div class="box">
+    <p><strong>In short:</strong> Baa-ook Club has no servers of its own that store your data, no accounts, no analytics and no ads. To read your book and answer you, it sends your book and your questions to Google's Gemini API. Please don't upload anything sensitive, confidential or personal.</p>
+  </div>
+
+  <h2>Who this covers</h2>
+  <p>This policy covers the Baa-ook Club browser extension (for Firefox and other browsers) and the Baa-ook Club website at <a href="https://baa-ook-book-club.vercel.app/">baa-ook-book-club.vercel.app</a>. Baa-ook Club is a personal, open-source project by Shriya Singh. The code is public at <a href="https://github.com/shriy-singh/baa-ook-club">github.com/shriy-singh/baa-ook-club</a>.</p>
+
+  <h2>What the extension handles</h2>
+  <ul>
+    <li><strong>Your Gemini API key.</strong> You paste your own key from Google AI Studio. It is stored only in your browser's local extension storage on that device. It is not synced, and it is only ever sent to Google's Gemini API to authorise your own requests. You can remove it at any time with "Forget my key", or by uninstalling the extension.</li>
+    <li><strong>Books you upload.</strong> The PDF goes directly from your browser to the Gemini Files API so the hosts can read it. Google keeps uploaded files for 48 hours and then deletes them.</li>
+    <li><strong>Your questions and the answers.</strong> What you type (or say, see below) is sent to Gemini together with a short instruction describing the host's personality. Gemini's written answer is then sent back to Gemini's text-to-speech service to create the host's voice.</li>
+    <li><strong>Your voice.</strong> If your browser supports it, the mic button uses the browser's built-in speech recognition to turn what you say into text. In Chrome and other Chromium-based browsers, that audio is processed by the browser maker's speech service. Firefox has no built-in speech recognition, so the mic button doesn't appear there and nothing is recorded.</li>
+  </ul>
+  <p>The extension can only connect to itself and to Google's Gemini API (<code>generativelanguage.googleapis.com</code>). It does not read the websites you visit, your tabs or your browsing history.</p>
+
+  <h2>What Google does with it</h2>
+  <p>Your book, questions and answers are processed by Google under the <a href="https://ai.google.dev/gemini-api/terms">Gemini API Additional Terms of Service</a> and the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>, using the API key you provide.</p>
+  <p>If your key uses Gemini's free (unpaid) tier, Google says it uses the content you submit to provide, improve and develop its products, and that human reviewers may read it (after disconnecting it from your account and key). That is why you shouldn't upload sensitive, confidential or personal documents. If you are in the European Economic Area, Switzerland or the United Kingdom, Google applies its paid-service data terms to free use as well. If your key has billing enabled, Google's paid-service terms apply.</p>
+
+  <h2>The website version</h2>
+  <p>The website works the same way, except that its server sends requests to Gemini using the site's own key, so you don't need one. The server passes your book and questions to Gemini and returns the answers; it does not store them. The hosting provider (Vercel) keeps standard technical request logs. The website remembers nothing about you between visits.</p>
+
+  <h2>What we never do</h2>
+  <ul>
+    <li>No accounts, sign-ups, analytics, tracking or advertising.</li>
+    <li>No selling or sharing of data with anyone other than Google, as described above.</li>
+    <li>No storing of your books, questions or key on any server we run.</li>
+  </ul>
+
+  <h2>Age</h2>
+  <p>Google's Gemini API terms require users to be 18 or older, so Baa-ook Club is for adults only, even though the hosts are cartoon characters.</p>
+
+  <h2>Changes and contact</h2>
+  <p>If this policy changes, the new version will be posted on this page with a new date. Questions or concerns: please open an issue at <a href="https://github.com/shriy-singh/baa-ook-club/issues">github.com/shriy-singh/baa-ook-club/issues</a>.</p>
+
+  <a class="back" href="./">← Back to the Baa-ook Club case study</a>
+</main>
+</body>
+</html>

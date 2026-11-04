@@ -80,7 +80,11 @@ export default function KeySetup({ hasKey, onSaved, onCancel, onForgotten }: Pro
 
         <p className="key-note">
           Your key is stored only in this browser and is only ever sent to Google. Books you upload go to Gemini, which
-          keeps them for 48 hours. Gemini's free tier has daily limits.
+          keeps them for 48 hours. On the free tier Google may use what you send to improve its products, so don't upload
+          anything sensitive. Gemini requires users to be 18 or older.{" "}
+          <a href="https://shriy-singh.github.io/baa-ook-club/privacy.html" target="_blank" rel="noreferrer">
+            Privacy policy
+          </a>
         </p>
 
         {hasKey && (
